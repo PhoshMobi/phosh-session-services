@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="SyncbusWindow" parent="AdwApplicationWindow">
+    <property name="title">Syncbus</property>
+    <property name="content">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar"/>
+        </child>
+        <property name="content">
+          <object class="AdwPreferencesPage">
+            <child>
+              <object class="AdwPreferencesGroup">
+                <property name="title">General</property>
+                <child>
+                  <object class="AdwActionRow" id="enable_row">
+                    <property name="title">Enable Syncthing</property>
+                    <property name="subtitle">Enable Syncthing through Systemd.</property>
+                    <property name="activatable">1</property>
+                    <signal name="activated" handler="on_enable_activated" swapped="1"/>
+                    <child>
+                      <object class="GtkImage" id="enable_img">
+                        <property name="pixel-size">16</property>
+                        <property name="icon-name">play-symbolic</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="url_row">
+                    <property name="title">Syncthing GUI</property>
+                    <property name="activatable">1</property>
+                    <signal name="activated" handler="on_url_activated" swapped="1"/>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="pixel-size">16</property>
+                        <property name="icon-name">external-link-symbolic</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow" id="error_row">
+                    <property name="title">Error</property>
+                    <property name="subtitle">No errors set.</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwPreferencesGroup" id="folders_group">
+                <property name="title">Folders</property>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>
