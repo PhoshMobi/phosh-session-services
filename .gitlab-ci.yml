@@ -1,0 +1,27 @@
+image: debian:testing
+
+before_script:
+  - apt-get update -y
+  - apt-get install -y build-essential libadwaita-1-dev rustup
+  - rustup default stable
+  - rustup toolchain install nightly
+  - rustup component add clippy rustfmt
+
+stages:
+  - lint
+  - build
+
+lint:
+  stage: lint
+  script:
+    - cargo +nightly fmt --all --check
+    - cargo clippy --workspace --no-deps -- -D warnings
+
+build:
+  stage: build
+  script:
+    - cargo build --release --workspace
+  artifacts:
+    paths:
+      - target/release/server
+      - target/release/demo
