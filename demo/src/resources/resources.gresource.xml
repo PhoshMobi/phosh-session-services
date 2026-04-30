@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gresources>
+  <gresource prefix="/mobi/phosh/syncbus/demo">
+    <file compressed="true" preprocess="xml-stripblanks">ui/folder_row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/window.ui</file>
+    <file preprocess="xml-stripblanks">icons/external-link-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/play-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/stop-symbolic.svg</file>
+  </gresource>
+</gresources>

@@ -1,0 +1,50 @@
+[package]
+name = "server"
+version.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies.futures-util]
+default-features = false
+version = "0.3"
+
+[dependencies.quick-xml]
+default-features = false
+features = ["serialize"]
+version = "0.39"
+
+[dependencies.reqwest]
+default-features = false
+features = ["json", "query"]
+version = "0.13"
+
+[dependencies.serde]
+default-features = false
+version = "1.0"
+
+[dependencies.serde_json]
+default-features = false
+version = "1.0"
+
+[dependencies.tokio]
+default-features = false
+features = ["fs", "macros", "rt", "sync", "time"]
+version = "1.49"
+
+[dependencies.tracing]
+features = ["log"]
+version = "0.1"
+
+[dependencies.tracing-subscriber]
+version = "0.3"
+
+[dependencies.url]
+default-features = false
+version = "2.5"
+
+[dependencies.zbus]
+default-features = false
+features = ["tokio"]
+version = "5.13"

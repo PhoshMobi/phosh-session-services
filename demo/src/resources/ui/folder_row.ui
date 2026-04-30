@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="SyncbusFolderRow" parent="AdwActionRow">
+    <property name="activatable">1</property>
+    <signal name="activated" handler="on_activated" swapped="1"/>
+    <child>
+      <object class="GtkImage" id="image">
+        <property name="pixel-size">16</property>
+        <property name="icon-name">play-symbolic</property>
+      </object>
+    </child>
+  </template>
+</interface>
