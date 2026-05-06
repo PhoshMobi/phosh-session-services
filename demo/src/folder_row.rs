@@ -141,10 +141,15 @@ mod imp {
             let binding = self.proxy.borrow();
             let proxy = binding.as_ref().unwrap();
 
-            let params = (!self.paused.get(),).to_variant();
+            let params = (
+                "mobi.phosh.syncbus.Folder",
+                "Paused",
+                (!self.paused.get()).to_variant(),
+            )
+                .to_variant();
 
             proxy.call(
-                "SetPaused",
+                "org.freedesktop.DBus.Properties.Set",
                 Some(&params),
                 gio::DBusCallFlags::NONE,
                 -1,
@@ -155,7 +160,7 @@ mod imp {
                     }
 
                     let error = result.err().unwrap();
-                    glib::g_critical!(LOG_DOMAIN, "SetPaused failed: {error}");
+                    glib::g_critical!(LOG_DOMAIN, "Set Paused failed: {error}");
                 },
             );
         }
