@@ -17,11 +17,7 @@ const EVENTS: &str =
 
 #[allow(clippy::cast_possible_truncation)]
 fn get_completion(need: u64, global: u64) -> u8 {
-    let completion = if global == 0 {
-        100
-    } else {
-        100 - (need * 100) / global
-    };
+    let completion = 100 - (need * 100).checked_div(global).unwrap_or(0);
     completion as u8
 }
 
