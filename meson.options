@@ -1,0 +1,18 @@
+option(
+    'dbus_service_dir',
+    type: 'string',
+    description: 'Directory for D-Bus service files.',
+)
+
+option(
+    'systemd_user_unit_dir',
+    type: 'string',
+    description: 'Directory for Systemd user units.',
+)
+
+option(
+    'demo',
+    type: 'boolean',
+    value: false,
+    description: 'Build the demo client.',
+)

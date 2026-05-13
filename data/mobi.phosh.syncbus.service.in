@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=mobi.phosh.syncbus
+Exec=@LIBEXEC_DIR@/@EXE_NAME@
+SystemdService=@EXE_NAME@.service

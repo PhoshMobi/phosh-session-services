@@ -14,10 +14,20 @@ Syncbus requires a few runtime dependencies.
 
 ## Getting Started
 
-Syncbus is written in Rust, so it needs standard Rust development setup.
+Syncbus is written in Rust, so it needs standard Rust development setup. Meson
+is used as build system to help in configuring files.
+
+First, setup and compile the project.
 
 ```sh
-$ cargo run
+$ meson setup build
+$ meson compile build
+```
+
+Then, run the server `phosh-syncbus`.
+
+```sh
+$ build/server/phosh-syncbus
 ```
 
 You can use
@@ -25,7 +35,7 @@ You can use
 configure logging. For example, to enable debug logging, use `RUST_LOG=debug`.
 
 ```sh
-$ RUST_LOG=debug cargo run
+$ RUST_LOG=debug build/server/phosh-syncbus
 ```
 
 ## Demo
@@ -36,19 +46,51 @@ demonstrate the different APIs of the server.
 
 ![](./data/screenshots/demo-1.png)
 
-The demo can be built by using the `demo` package name.
+The demo can be built by enabling `demo` option on Meson.
+
+```sh
+$ meson configure build -Ddemo=true
+$ meosn compile -C build
+```
 
 As the demo communicates with the D-Bus server, you need to have the server
 running before the demo is launched.
 
 ```sh
-$ cargo run&
-$ cargo run -p demo
+$ build/server/phosh-syncbus&
+$ build/demo/phosh-syncbus-demo
 ```
 
 ## API
 
 Please check [`docs/api.md`](./docs/api.md).
+
+## Service and Interface Files
+
+If `meson install` is used, a few helpful files are installed in the prefix. It
+includes D-Bus service and Systemd unit file for Syncbus and D-Bus interface
+descriptions of Syncbus.
+
+```sh
+$ meson install -C build
+$ tree prefix
+prefix
+├── lib
+│   └── x86_64-linux-gnu
+│       └── systemd
+│           └── user
+│               └── phosh-syncbus.service
+├── libexec
+│   ├── phosh-syncbus
+│   └── phosh-syncbus-demo
+└── share
+    └── dbus-1
+        ├── interfaces
+        │   ├── mobi.phosh.syncbus.Folder.xml
+        │   └── mobi.phosh.syncbus.Manager.xml
+        └── services
+            └── mobi.phosh.syncbus.service
+```
 
 ## Getting in Touch
 

@@ -2,7 +2,7 @@ image: debian:testing
 
 before_script:
   - apt-get update -y
-  - apt-get install -y build-essential libadwaita-1-dev rustup
+  - apt-get install -y build-essential libadwaita-1-dev meson rustup
   - rustup default stable
   - rustup toolchain install nightly
   - rustup component add clippy rustfmt
@@ -14,14 +14,16 @@ stages:
 lint:
   stage: lint
   script:
-    - cargo +nightly fmt --all --check
-    - cargo clippy --workspace --no-deps -- -D warnings
+    - meson setup build -Ddemo=true
+    - CARGO_HOME=build/cargo cargo +nightly fmt --all --check
+    - CARGO_HOME=build/cargo cargo clippy --target-dir build/target --workspace --no-deps -- -D warnings
 
 build:
   stage: build
   script:
-    - cargo build --release --workspace
+    - meson setup build -Ddemo=true -Dbuildtype=release
+    - meson compile -C build
   artifacts:
     paths:
-      - target/release/server
-      - target/release/demo
+      - build/server/phosh-syncbus
+      - build/demo/phosh-syncbus-demo
