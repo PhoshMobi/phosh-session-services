@@ -1,0 +1,11 @@
+Syncbus 0.1.0
+-------------
+Released May 2026.
+* Initialized the repository with a D-Bus server and Adwaita based demo client.
+* Contributors:
+    * Arun Mani J
+    * Evangelos Ribeiro Tzaras
+    * Gotam Gorabh
+    * Guido Günther
+    * jarbus
+    * Rudra Pratap Singh
