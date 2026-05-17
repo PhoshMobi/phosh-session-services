@@ -1,0 +1,28 @@
+Source: phosh-session-services
+Section: gnome
+Priority: optional
+Maintainer: Guido Günther <agx@sigxcpu.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ cargo,
+ meson,
+ pkgconf,
+ rustc (>= 1.86),
+ systemd-dev,
+Rules-Requires-Root: no
+Standards-Version: 4.7.4
+
+Package: phosh-session-services
+Architecture: linux-any
+Depends:
+ dbus-user-session | dbus-x11,
+ ${misc:Depends},
+ ${shlibs:Depends},
+Recommends:
+ syncthing,
+Multi-Arch: foreign
+Description: Services for Phosh's user session
+ Additional, non-essential, but recommended services for Phosh's user session.
+ It contains
+ .
+ * phosh-syncbus: A DBus interface to syncthing

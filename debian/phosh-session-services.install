@@ -1,0 +1,4 @@
+usr/lib/systemd/user/phosh-syncbus.service
+usr/libexec/phosh-syncbus
+usr/share/dbus-1/interfaces
+usr/share/dbus-1/services
