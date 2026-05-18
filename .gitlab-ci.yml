@@ -1,3 +1,12 @@
+---
+include:
+  - project: 'World/Phosh/meta-phosh'
+    ref: '5dc236ce724a53282339ebb362639577b7ad3cdf'
+    file: '/ci/phosh-common-jobs.yml'
+  - project: 'Infrastructure/freedesktop-ci-templates'
+    ref: 'd03cddbcff35f26861429fc816c00323f48e99af'
+    file: '/templates/ci-fairy.yml'
+
 image: debian:testing
 
 before_script:
@@ -8,11 +17,13 @@ before_script:
   - rustup component add clippy rustfmt
 
 stages:
-  - lint
   - build
+  - test
+  - style-checks
+  - package
 
 lint:
-  stage: lint
+  stage: test
   script:
     - meson setup build -Ddemo=true
     - CARGO_HOME=build/cargo cargo +nightly fmt --all --check
@@ -27,3 +38,17 @@ build:
     paths:
       - build/server/phosh-syncbus
       - build/demo/phosh-syncbus-demo
+
+check-meson:
+  stage: style-checks
+  extends:
+    - .phosh-check-meson
+
+check-consistency:
+  stage: test
+  extends: .phosh-check-consistency
+
+package:deb-debian-forky:
+  before_script: []
+  stage: package
+  extends: .phosh-build-debian-package
