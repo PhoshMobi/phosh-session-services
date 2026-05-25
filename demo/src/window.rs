@@ -37,8 +37,8 @@ mod imp {
 
         enabled: Cell<bool>,
         cancellable: OnceCell<gio::Cancellable>,
-        proxy: RefCell<Option<gio::DBusProxy>>,
-        manager: RefCell<Option<gio::DBusObjectManagerClient>>,
+        proxy: OnceCell<gio::DBusProxy>,
+        manager: OnceCell<gio::DBusObjectManagerClient>,
 
         folders: RefCell<HashMap<glib::GString, FolderRow>>,
     }
@@ -97,8 +97,7 @@ mod imp {
     #[gtk::template_callbacks]
     impl Window {
         fn on_properties_changed(&self) {
-            let binding = self.proxy.borrow();
-            let proxy = binding.as_ref().unwrap();
+            let proxy = self.proxy.get().unwrap();
 
             let enabled = if let Some(value) = proxy.cached_property("Enabled") {
                 <bool>::from_variant(&value).unwrap()
@@ -195,7 +194,7 @@ mod imp {
                         .on_properties_changed()
                 ),
             );
-            *self.proxy.borrow_mut() = Some(proxy);
+            self.proxy.set(proxy).unwrap();
             self.on_properties_changed();
 
             glib::spawn_future_local(glib::clone!(
@@ -233,7 +232,7 @@ mod imp {
                         this.on_object_added(&object);
                     }
 
-                    *this.manager.borrow_mut() = Some(manager);
+                    this.manager.set(manager).unwrap();
                 }
             ));
         }
@@ -250,8 +249,7 @@ mod imp {
 
         #[template_callback]
         fn on_enable_activated(&self, _row: adw::ActionRow) {
-            let binding = self.proxy.borrow();
-            let proxy = binding.as_ref().unwrap();
+            let proxy = self.proxy.get().unwrap();
 
             let method = if self.enabled.get() { "Stop" } else { "Start" };
 

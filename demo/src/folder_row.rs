@@ -1,4 +1,4 @@
-use std::cell::{Cell, OnceCell, RefCell};
+use std::cell::{Cell, OnceCell};
 
 use adw::gtk::CompositeTemplate;
 use adw::prelude::*;
@@ -21,7 +21,7 @@ mod imp {
         image: TemplateChild<gtk::Image>,
 
         #[property(get, construct_only)]
-        proxy: RefCell<Option<gio::DBusProxy>>,
+        proxy: OnceCell<gio::DBusProxy>,
 
         paused: Cell<bool>,
         cancellable: OnceCell<gio::Cancellable>,
@@ -50,10 +50,7 @@ mod imp {
 
             self.cancellable.set(gio::Cancellable::new()).unwrap();
 
-            let binding = self.proxy.borrow();
-            let proxy = binding.as_ref().unwrap();
-
-            proxy.connect_closure(
+            self.proxy.get().unwrap().connect_closure(
                 "g-properties-changed",
                 false,
                 glib::closure_local!(
@@ -82,8 +79,7 @@ mod imp {
     #[gtk::template_callbacks]
     impl FolderRow {
         fn on_properties_changed(&self) {
-            let binding = self.proxy.borrow();
-            let proxy = binding.as_ref().unwrap();
+            let proxy = self.proxy.get().unwrap();
 
             let label = if let Some(value) = proxy.cached_property("Label") {
                 <String>::from_variant(&value).unwrap()
@@ -138,9 +134,6 @@ mod imp {
 
         #[template_callback]
         fn on_activated(&self, _row: adw::ActionRow) {
-            let binding = self.proxy.borrow();
-            let proxy = binding.as_ref().unwrap();
-
             let params = (
                 "mobi.phosh.syncbus.Folder",
                 "Paused",
@@ -148,7 +141,7 @@ mod imp {
             )
                 .to_variant();
 
-            proxy.call(
+            self.proxy.get().unwrap().call(
                 "org.freedesktop.DBus.Properties.Set",
                 Some(&params),
                 gio::DBusCallFlags::NONE,
