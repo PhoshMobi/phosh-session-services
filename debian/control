@@ -5,6 +5,8 @@ Maintainer: Guido Günther <agx@sigxcpu.org>
 Build-Depends:
  debhelper-compat (= 13),
  cargo | rustup,
+ desktop-file-utils,
+ gtk-update-icon-cache,
  libadwaita-1-dev,
  meson,
  pkgconf,

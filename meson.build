@@ -5,7 +5,13 @@ project(
     meson_version: '>= 1.1',
 )
 
+gnome = import('gnome')
 i18n = import('i18n')
+
+services = [
+    # service name / app-id / descriptive name
+    ['phosh-os-updater', 'mobi.phosh.OsUpdater', 'Phosh OS Update Notifier'],
+]
 
 server_exe_name = 'phosh-syncbus'
 demo_exe_name = 'phosh-syncbus-demo'
@@ -16,9 +22,11 @@ prefix = get_option('prefix')
 data_dir = prefix / get_option('datadir')
 lib_dir = get_option('libdir')
 libexec_dir = prefix / get_option('libexecdir')
+locale_dir = prefix / get_option('localedir')
 
 dbus_dir = data_dir / 'dbus-1'
 dbus_services_dir = dbus_dir / 'services'
+desktop_dir = data_dir / 'applications'
 
 systemd_user_unit_dir = get_option('systemd_user_unit_dir')
 systemd_dep = dependency('systemd', version: '>= 242', required: false)
@@ -49,7 +57,10 @@ cargo_env.set('CARGO_HOME', meson.project_build_root() / 'cargo')
 subdir('po')
 subdir('data')
 subdir('server')
+subdir('phosh-os-updater')
 
 if get_option('demo')
     subdir('demo')
 endif
+
+gnome.post_install(gtk_update_icon_cache: true, update_desktop_database: true)

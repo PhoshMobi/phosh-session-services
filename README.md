@@ -96,6 +96,11 @@ prefix
             └── mobi.phosh.syncbus.service
 ```
 
+## Phosh OS Updater
+
+phosh-os-updater indicates when new OS updates are available. It uses
+`org.freedesktop.sysupdate1` for that.
+
 ## Getting in Touch
 
 Please use [`phosh.mobi`](https://matrix.to/#/#phosh:phosh.mobi) Matrix channel
