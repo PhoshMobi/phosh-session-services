@@ -1,18 +1,22 @@
-# Syncbus
+# Phosh Session Services
+
+A set of services to run in Phosh's session
+
+## Syncbus
 
 Syncbus is a D-Bus server for [Syncthing](https://syncthing.net/). It exposes
 few functionalities of Syncthing through D-Bus properties and methods.
 
 This server is based on the v2.0.0 of Syncthing [REST API](https://docs.syncthing.net/v2.0.0/dev/rest.html).
 
-## Prerequisites
+### Prerequisites
 
 Syncbus requires a few runtime dependencies.
 
 1. Syncthing must be configured to be available via HTTP API.
 2. Systemd with a `syncthing.service` unit to manage Syncthing.
 
-## Getting Started
+### Getting Started
 
 Syncbus is written in Rust, so it needs standard Rust development setup. Meson
 is used as build system to help in configuring files.
@@ -38,7 +42,7 @@ configure logging. For example, to enable debug logging, use `RUST_LOG=debug`.
 $ RUST_LOG=debug build/server/phosh-syncbus
 ```
 
-## Demo
+### Demo
 
 Syncbus comes with a simple demo written in
 [Adwaita](https://gnome.pages.gitlab.gnome.org/libadwaita/). It is meant to
@@ -61,11 +65,11 @@ $ build/server/phosh-syncbus&
 $ build/demo/phosh-syncbus-demo
 ```
 
-## API
+### API
 
 Please check [`docs/api.md`](./docs/api.md).
 
-## Service and Interface Files
+### Service and Interface Files
 
 If `meson install` is used, a few helpful files are installed in the prefix. It
 includes D-Bus service and Systemd unit file for Syncbus and D-Bus interface
