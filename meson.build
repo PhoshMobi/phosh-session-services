@@ -1,4 +1,9 @@
-project('syncbus', 'rust', version: '0.1.0', meson_version: '>= 1.1')
+project(
+    'phosh-session-services',
+    'rust',
+    version: '0.1.0',
+    meson_version: '>= 1.1',
+)
 
 server_exe_name = 'phosh-syncbus'
 demo_exe_name = 'phosh-syncbus-demo'
