@@ -5,6 +5,8 @@ project(
     meson_version: '>= 1.1',
 )
 
+i18n = import('i18n')
+
 server_exe_name = 'phosh-syncbus'
 demo_exe_name = 'phosh-syncbus-demo'
 
@@ -44,6 +46,7 @@ endif
 cargo_env = environment()
 cargo_env.set('CARGO_HOME', meson.project_build_root() / 'cargo')
 
+subdir('po')
 subdir('data')
 subdir('server')
 
