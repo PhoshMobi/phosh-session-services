@@ -4,10 +4,11 @@ Priority: optional
 Maintainer: Guido Günther <agx@sigxcpu.org>
 Build-Depends:
  debhelper-compat (= 13),
- cargo,
+ cargo | rustup,
+ libadwaita-1-dev,
  meson,
  pkgconf,
- rustc (>= 1.86),
+ rustc (>= 1.86) | rustup,
  systemd-dev,
 Rules-Requires-Root: no
 Standards-Version: 4.7.4
