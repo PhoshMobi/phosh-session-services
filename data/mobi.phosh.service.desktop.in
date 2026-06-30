@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=@name@
+Exec=@libexecdir@/@service_exe@
+Icon=@icon@
+OnlyShowIn=Phosh;
+NoDisplay=true

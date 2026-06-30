@@ -1,0 +1,12 @@
+[Unit]
+Description=@description@
+PartOf=graphical-session.target
+After=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+
+[Service]
+ExecStart=@libexecdir@/@service_exe@
+Restart=on-abnormal
+RestartSec=10s
+
+

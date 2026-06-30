@@ -11,7 +11,8 @@ image: debian:testing
 
 before_script:
   - apt-get update -y
-  - apt-get install -y build-essential libadwaita-1-dev meson rustup
+  - apt-get install -y build-essential rustup
+  - apt -y build-dep .
   - rustup default stable
   - rustup toolchain install nightly
   - rustup component add clippy rustfmt

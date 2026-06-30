@@ -1,0 +1,19 @@
+[package]
+name = "phosh-session-services"
+version.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+async-channel = "2.5.0"
+futures-lite = "2.6.1"
+log = "0.4.32"
+serde = "1.0.228"
+zvariant = "5.12.0"
+
+[dependencies.zbus]
+default-features = false
+features = ["tokio"]
+version = "5.13"

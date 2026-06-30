@@ -1,4 +1,7 @@
-usr/lib/systemd/user/phosh-syncbus.service
-usr/libexec/phosh-syncbus
+usr/lib/systemd/user/*.service
+usr/libexec/*
+usr/share/applications/*.desktop
 usr/share/dbus-1/interfaces
 usr/share/dbus-1/services
+usr/share/icons/hicolor/symbolic/apps/*.svg
+usr/share/locale/*/LC_MESSAGES/phosh-session-services.mo
