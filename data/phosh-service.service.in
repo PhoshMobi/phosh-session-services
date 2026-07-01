@@ -3,6 +3,7 @@ Description=@description@
 PartOf=graphical-session.target
 After=graphical-session.target
 ConditionEnvironment=WAYLAND_DISPLAY
+ConditionUser=!@system
 
 [Service]
 ExecStart=@libexecdir@/@service_exe@
