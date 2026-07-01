@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 
 use clap::Parser;
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, setlocale, textdomain};
-use log::{debug, info, trace};
+use log::{debug, info, trace, warn};
 use phosh_os_updater::config;
 use phosh_os_updater::updater::{UpdateChecker, UpdateError, UpdateInfo};
 use phosh_session_services::{nm, noti, pms};
@@ -38,7 +38,9 @@ impl Service {
         let nm = self.nm.clone();
         tokio::spawn(async move {
             nm.monitor_connectivity(move |c| {
-                let _ = tx.try_send(c);
+                if let Err(err) = tx.try_send(c) {
+                    trace!("Failed to send connectivity update: {err}");
+                }
             })
             .await
             .unwrap();
@@ -53,7 +55,9 @@ impl Service {
         let noti = self.noti_manager.clone();
         tokio::spawn(async move {
             noti.monitor(move |c| {
-                let _ = tx.try_send(c);
+                if let Err(err) = tx.try_send(c) {
+                    trace!("Failed to send notification signal: {err}");
+                }
             })
             .await
             .unwrap();
@@ -184,14 +188,18 @@ async fn main() -> zbus::Result<()> {
                     noti::Event::ActionInvoked { id, action } => {
                         trace!("Notification {id} actioned with {action}");
                         let pms = pms::MobileSettingsPanel::new().await?;
-                        let _ = pms.open_panel("updates", None).await;
+                        if let Err(err) = pms.open_panel("updates", None).await {
+                            warn!("Panel open failed: {err}");
+                        }
                     }
                 }
             }
 
             () = &mut next_check => {
                 if connectivity == nm::Connectivity::Full {
-                    let _ = app.maybe_notify_update().await;
+                    if let Err(err) = app.maybe_notify_update().await {
+                        warn!("Update check failed: {err}");
+                    }
                     last_update_check = Some(Instant::now());
                 }
 
