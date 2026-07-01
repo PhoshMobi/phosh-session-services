@@ -7,7 +7,7 @@ use clap::Parser;
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, setlocale, textdomain};
 use log::{debug, info, trace};
 use phosh_os_updater::config;
-use phosh_os_updater::updater::{UpdateChecker, UpdateInfo};
+use phosh_os_updater::updater::{UpdateChecker, UpdateError, UpdateInfo};
 use phosh_session_services::{nm, noti, pms};
 use tokio::time::sleep;
 
@@ -77,7 +77,7 @@ impl Service {
         Ok(())
     }
 
-    async fn maybe_notify_update(&mut self) -> zbus::Result<()> {
+    async fn maybe_notify_update(&mut self) -> std::result::Result<(), UpdateError> {
         trace!("Checking for updates…");
         match self.update_checker.check_for_updates().await {
             Ok(Some(update)) => {
@@ -99,6 +99,9 @@ impl Service {
                 debug!("No updates available");
                 self.update = None;
             }
+
+            // Bubble up NotSupported so we can quit
+            Err(e @ UpdateError::NotSupported(_)) => return Err(e),
 
             Err(err) => {
                 debug!("Failed to check for updates: {err}");
@@ -160,7 +163,17 @@ async fn main() -> zbus::Result<()> {
                 if old != nm::Connectivity::Full
                 && connectivity == nm::Connectivity::Full
                 && should_check_updates(last_update_check) {
-                    let _ = app.maybe_notify_update().await;
+                    match app.maybe_notify_update().await {
+                        Err(UpdateError::NotSupported(_)) => {
+                            info!("Update service not supported, quitting");
+                            break;
+                        },
+                        Err(err) => {
+                            debug!("Update check failed: {err}");
+                        }
+                        Ok(()) => {}
+                    }
+
                     last_update_check = Some(Instant::now());
                     next_check = Box::pin(sleep(random_delay()));
                 }
