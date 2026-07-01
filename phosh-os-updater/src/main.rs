@@ -10,7 +10,6 @@ use phosh_os_updater::config;
 use phosh_os_updater::updater::{UpdateChecker, UpdateInfo};
 use phosh_session_services::{nm, noti, pms};
 use tokio::time::sleep;
-use zbus::Result;
 
 struct Service {
     nm: nm::NetworkManager,
@@ -21,7 +20,7 @@ struct Service {
 }
 
 impl Service {
-    pub async fn new(app_id: &str) -> Result<Self> {
+    pub async fn new(app_id: &str) -> zbus::Result<Self> {
         let network_manager = nm::NetworkManager::new().await?;
 
         Ok(Self {
@@ -63,7 +62,7 @@ impl Service {
         rx
     }
 
-    async fn notify_update(&mut self) -> Result<()> {
+    async fn notify_update(&mut self) -> zbus::Result<()> {
         let update = self.update.as_ref().unwrap();
         let msg = gettext("Update to {} available").replace("{}", &update.version);
         let noti = noti::Noti::new()
@@ -78,7 +77,7 @@ impl Service {
         Ok(())
     }
 
-    async fn maybe_notify_update(&mut self) -> Result<()> {
+    async fn maybe_notify_update(&mut self) -> zbus::Result<()> {
         trace!("Checking for updates…");
         match self.update_checker.check_for_updates().await {
             Ok(Some(update)) => {
@@ -138,7 +137,7 @@ fn i18n_init() {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> zbus::Result<()> {
     tracing_subscriber::fmt::init();
 
     i18n_init();
