@@ -3,6 +3,7 @@ Description=A D-Bus server for Syncthing.
 PartOf=graphical-session.target
 After=graphical-session.target
 ConditionEnvironment=WAYLAND_DISPLAY
+ConditionUser=!@system
 
 [Service]
 Type=dbus
