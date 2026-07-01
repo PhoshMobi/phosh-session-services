@@ -4,8 +4,12 @@ PartOf=graphical-session.target
 After=graphical-session.target
 ConditionEnvironment=WAYLAND_DISPLAY
 ConditionUser=!@system
+After=gnome-session-initialized.target
 
 [Service]
 Type=dbus
 BusName=mobi.phosh.syncbus
 ExecStart=@LIBEXEC_DIR@/@EXE_NAME@
+
+[Install]
+WantedBy=mobi.phosh.Shell.target

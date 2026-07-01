@@ -4,10 +4,12 @@ PartOf=graphical-session.target
 After=graphical-session.target
 ConditionEnvironment=WAYLAND_DISPLAY
 ConditionUser=!@system
+After=gnome-session-initialized.target
 
 [Service]
 ExecStart=@libexecdir@/@service_exe@
 Restart=on-abnormal
 RestartSec=10s
 
-
+[Install]
+WantedBy=mobi.phosh.Shell.target
