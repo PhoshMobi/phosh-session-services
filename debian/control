@@ -29,3 +29,4 @@ Description: Services for Phosh's user session
  It contains
  .
  * phosh-syncbus: A DBus interface to syncthing
+ * phosh-os-updater: OS Update Notifier
