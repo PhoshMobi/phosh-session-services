@@ -31,7 +31,7 @@ $ meson compile build
 Then, run the server `phosh-syncbus`.
 
 ```sh
-$ build/server/phosh-syncbus
+$ build/phosh-syncbus/phosh-syncbus
 ```
 
 You can use
@@ -39,7 +39,7 @@ You can use
 configure logging. For example, to enable debug logging, use `RUST_LOG=debug`.
 
 ```sh
-$ RUST_LOG=debug build/server/phosh-syncbus
+$ RUST_LOG=debug build/phosh-syncbus/phosh-syncbus
 ```
 
 ### Demo
@@ -61,7 +61,7 @@ As the demo communicates with the D-Bus server, you need to have the server
 running before the demo is launched.
 
 ```sh
-$ build/server/phosh-syncbus&
+$ build/phosh-syncbus/phosh-syncbus &
 $ build/demo/phosh-syncbus-demo
 ```
 
