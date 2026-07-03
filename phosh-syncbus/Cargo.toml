@@ -30,7 +30,7 @@ version = "1.0"
 
 [dependencies.tokio]
 default-features = false
-features = ["fs", "macros", "rt", "sync", "time"]
+features = ["fs", "macros", "process", "rt", "sync", "time"]
 version = "1.49"
 
 [dependencies.tracing]
