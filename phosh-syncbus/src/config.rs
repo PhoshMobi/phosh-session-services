@@ -62,6 +62,22 @@ async fn get_config_path() -> Option<PathBuf> {
     None
 }
 
+async fn generate_config() -> Result<()> {
+    let status = tokio::process::Command::new("syncthing")
+        .arg("generate")
+        .status()
+        .await?;
+
+    if status.success() {
+        return Ok(());
+    }
+
+    let error = std::io::Error::other(format!(
+        "Failed to generate Syncthing configuration: {status}"
+    ));
+    Err(error.into())
+}
+
 pub fn address_to_url(address: &str) -> Result<Url> {
     if Path::new(address).is_absolute() {
         return Err(format!("{address} is not a supported URL").into());
@@ -80,6 +96,11 @@ pub fn address_to_url(address: &str) -> Result<Url> {
 }
 
 pub async fn get_syncthing_configuration() -> Result<Config> {
+    if get_config_path().await.is_none() {
+        tracing::info!("Configuration not found, trying `syncthing generate`");
+        generate_config().await?;
+    }
+
     let Some(path) = get_config_path().await else {
         let error = std::io::Error::new(
             std::io::ErrorKind::NotFound,
