@@ -1,3 +1,16 @@
+phosh-session-services 0.2.0
+----------------------------
+Released July 2026
+* Add new OS update check service
+* Ensure services get pulled into the session
+* Issues fixed:
+    * https://gitlab.gnome.org/World/Phosh/syncbus/-/work_items/1
+* Contributors:
+    * Arun Mani J
+    * Guido Günther
+* UI translations:
+    * Guido Günther (de)
+
 Syncbus 0.1.0
 -------------
 Released May 2026.
