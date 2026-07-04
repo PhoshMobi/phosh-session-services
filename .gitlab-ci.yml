@@ -37,7 +37,8 @@ build:
     - meson compile -C build
   artifacts:
     paths:
-      - build/server/phosh-syncbus
+      - build/phosh-syncbus/phosh-syncbus
+      - build/phosh-os-updater/phosh-os-updater
       - build/demo/phosh-syncbus-demo
 
 check-meson:
