@@ -4,7 +4,8 @@ debian/*.debhelper.log
 debian/debhelper-build-stamp
 debian/files
 debian/phosh-session-services/
-debian/phosh-session-services.debhelper.log debian/tmp/
+debian/phosh-session-services.debhelper.log
 debian/phosh-session-services.substvars
+debian/phosh-session-services.*.debhelper
 debian/tmp
 po/phosh-session-services.pot
