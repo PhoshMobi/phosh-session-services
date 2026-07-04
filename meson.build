@@ -56,8 +56,8 @@ cargo_env.set('CARGO_HOME', meson.project_build_root() / 'cargo')
 
 subdir('po')
 subdir('data')
-subdir('server')
 subdir('phosh-os-updater')
+subdir('phosh-syncbus')
 
 if get_option('demo')
     subdir('demo')

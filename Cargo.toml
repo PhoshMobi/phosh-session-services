@@ -1,6 +1,6 @@
 [workspace]
-default-members = ["phosh-session-services", "server", "phosh-os-updater"]
-members = ["phosh-session-services", "demo", "server", "phosh-os-updater"]
+default-members = ["phosh-session-services", "phosh-os-updater", "phosh-syncbus"]
+members = ["phosh-session-services", "demo", "phosh-os-updater", "phosh-syncbus"]
 resolver = "3"
 
 [workspace.package]
