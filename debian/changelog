@@ -1,3 +1,44 @@
+phosh-session-services (0.2.0) experimental; urgency=medium
+
+  [ Guido Günther ]
+  * tree: Add initial packaging.
+    Closes: https://gitlab.gnome.org/World/Phosh/syncbus/-/work_items/1
+  * ci: Add more jobs.
+    Let's add some basic checks
+  * gitignore: Ignore more files
+  * doc: Allow for more services.
+    We can improve the docs further but let's make it at least less
+    confusing.
+  * build: Rename to phosh-session-services.
+    This lets it match the packaging
+  * build: Add po.
+    We'll have translations soon
+  * packaging: Install all services.
+    This eases handling of additional services
+  * ci: Install build dependencies.
+    No point in managing the list by hand
+  * tree: Add os update checker service.
+    This augments the bits in mobile settings. For now we only check
+    for updates and leave the installation to p-m-s. Once systemd
+    updated it's interfaces¹ we'll likely have this service as the
+    generic update interface.
+    We split common code into a phosh-session-services module so we can
+    reuse it easily and use a feature flag (but not trait) for the actual
+    update checker so we will be able to pick that at compile time.
+    To run against or mock in p-m-s use:
+        cargo run --bin phosh-os-updater --features=systemd-dbus-sysupdate1-session
+    ¹) https://salsa.debian.org/systemd-team/systemd/-/merge_requests/317
+  * data: Don't run services with system users.
+    They're not needed there and won't work due to e.g. lack
+    of polkit auth.
+  * packaging: Mention phosh-os-updater
+  * data: Make sure services become part of the Phosh session
+
+  [ Arun Mani J ]
+  * demo: Prefer `OnceCell` for set once fields
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 04 Jul 2026 21:21:00 +0200
+
 phosh-session-services (0.1.0) experimental; urgency=medium
 
   * Initial release.
