@@ -86,7 +86,20 @@ impl Sysupdate1UpdateChecker {
     pub async fn check_for_updates(&self) -> std::result::Result<Option<UpdateInfo>, UpdateError> {
         let sysupdate = Sysupdate1ManagerProxy::new(&self.conn).await?;
 
-        let targets = sysupdate.list_targets().await?;
+        let targets = match sysupdate.list_targets().await {
+            Err(e) => {
+                if let zbus::Error::MethodError(name, _, _) = &e
+                    && name.as_str() == "org.freedesktop.DBus.Error.ServiceUnknown"
+                {
+                    return Err(UpdateError::NotSupported(
+                        "org.freedesktop.sysupdate1".into(),
+                    ));
+                }
+                return Err(e.into());
+            }
+            Ok(t) => t,
+        };
+
         for target in targets {
             match self.check_target(&target).await {
                 Ok(Some(update)) => {

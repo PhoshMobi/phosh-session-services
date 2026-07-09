@@ -11,14 +11,15 @@ pub struct UpdateInfo {
 
 #[derive(Debug)]
 pub enum UpdateError {
-    // TODO: more info why update check failed?
     Failed(String),
+    NotSupported(String),
 }
 
 impl fmt::Display for UpdateError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Failed(msg) => write!(f, "{msg}"),
+            Self::NotSupported(service) => write!(f, "Service {service} not supported "),
         }
     }
 }

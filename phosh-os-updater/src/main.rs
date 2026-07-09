@@ -5,12 +5,11 @@ use std::time::{Duration, Instant};
 
 use clap::Parser;
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, setlocale, textdomain};
-use log::{debug, info, trace};
+use log::{debug, info, trace, warn};
 use phosh_os_updater::config;
-use phosh_os_updater::updater::{UpdateChecker, UpdateInfo};
+use phosh_os_updater::updater::{UpdateChecker, UpdateError, UpdateInfo};
 use phosh_session_services::{nm, noti, pms};
 use tokio::time::sleep;
-use zbus::Result;
 
 struct Service {
     nm: nm::NetworkManager,
@@ -21,7 +20,7 @@ struct Service {
 }
 
 impl Service {
-    pub async fn new(app_id: &str) -> Result<Self> {
+    pub async fn new(app_id: &str) -> zbus::Result<Self> {
         let network_manager = nm::NetworkManager::new().await?;
 
         Ok(Self {
@@ -39,7 +38,9 @@ impl Service {
         let nm = self.nm.clone();
         tokio::spawn(async move {
             nm.monitor_connectivity(move |c| {
-                let _ = tx.try_send(c);
+                if let Err(err) = tx.try_send(c) {
+                    trace!("Failed to send connectivity update: {err}");
+                }
             })
             .await
             .unwrap();
@@ -54,7 +55,9 @@ impl Service {
         let noti = self.noti_manager.clone();
         tokio::spawn(async move {
             noti.monitor(move |c| {
-                let _ = tx.try_send(c);
+                if let Err(err) = tx.try_send(c) {
+                    trace!("Failed to send notification signal: {err}");
+                }
             })
             .await
             .unwrap();
@@ -63,7 +66,7 @@ impl Service {
         rx
     }
 
-    async fn notify_update(&mut self) -> Result<()> {
+    async fn notify_update(&mut self) -> zbus::Result<()> {
         let update = self.update.as_ref().unwrap();
         let msg = gettext("Update to {} available").replace("{}", &update.version);
         let noti = noti::Noti::new()
@@ -78,7 +81,7 @@ impl Service {
         Ok(())
     }
 
-    async fn maybe_notify_update(&mut self) -> Result<()> {
+    async fn maybe_notify_update(&mut self) -> std::result::Result<(), UpdateError> {
         trace!("Checking for updates…");
         match self.update_checker.check_for_updates().await {
             Ok(Some(update)) => {
@@ -100,6 +103,9 @@ impl Service {
                 debug!("No updates available");
                 self.update = None;
             }
+
+            // Bubble up NotSupported so we can quit
+            Err(e @ UpdateError::NotSupported(_)) => return Err(e),
 
             Err(err) => {
                 debug!("Failed to check for updates: {err}");
@@ -138,7 +144,7 @@ fn i18n_init() {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> zbus::Result<()> {
     tracing_subscriber::fmt::init();
 
     i18n_init();
@@ -161,7 +167,17 @@ async fn main() -> Result<()> {
                 if old != nm::Connectivity::Full
                 && connectivity == nm::Connectivity::Full
                 && should_check_updates(last_update_check) {
-                    let _ = app.maybe_notify_update().await;
+                    match app.maybe_notify_update().await {
+                        Err(UpdateError::NotSupported(_)) => {
+                            info!("Update service not supported, quitting");
+                            break;
+                        },
+                        Err(err) => {
+                            debug!("Update check failed: {err}");
+                        }
+                        Ok(()) => {}
+                    }
+
                     last_update_check = Some(Instant::now());
                     next_check = Box::pin(sleep(random_delay()));
                 }
@@ -172,14 +188,18 @@ async fn main() -> Result<()> {
                     noti::Event::ActionInvoked { id, action } => {
                         trace!("Notification {id} actioned with {action}");
                         let pms = pms::MobileSettingsPanel::new().await?;
-                        let _ = pms.open_panel("updates", None).await;
+                        if let Err(err) = pms.open_panel("updates", None).await {
+                            warn!("Panel open failed: {err}");
+                        }
                     }
                 }
             }
 
             () = &mut next_check => {
                 if connectivity == nm::Connectivity::Full {
-                    let _ = app.maybe_notify_update().await;
+                    if let Err(err) = app.maybe_notify_update().await {
+                        warn!("Update check failed: {err}");
+                    }
                     last_update_check = Some(Instant::now());
                 }
 
