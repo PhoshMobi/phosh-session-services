@@ -10,6 +10,3 @@ After=gnome-session-initialized.target
 Type=dbus
 BusName=mobi.phosh.syncbus
 ExecStart=@LIBEXEC_DIR@/@EXE_NAME@
-
-[Install]
-WantedBy=mobi.phosh.Shell.target
