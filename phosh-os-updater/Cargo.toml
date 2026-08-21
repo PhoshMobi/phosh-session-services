@@ -20,7 +20,7 @@ async-channel = "2.5.0"
 clap = { version = "4.6.1", features = ["derive"] }
 futures-lite = "2.6.1"
 futures-util = "0.3.32"
-gettext-rs = "0.7.7"
+gettext-rs = "0.8.0"
 log = "0.4.32"
 phosh-session-services = { path = "../phosh-session-services" }
 rand = { version = "0.10.1", features = ["thread_rng"] }
