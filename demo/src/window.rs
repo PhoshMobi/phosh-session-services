@@ -126,18 +126,20 @@ mod imp {
                 return;
             };
 
-            let title;
-            let subtitle;
-            let icon_name;
-            if enabled {
-                title = "Disable Syncthing";
-                subtitle = "Disable Syncthing through Systemd.";
-                icon_name = "stop-symbolic";
+            let (title, subtitle, icon_name) = if enabled {
+                (
+                    "Disable Syncthing",
+                    "Disable Syncthing through Systemd.",
+                    "stop-symbolic",
+                )
             } else {
-                title = "Enable Syncthing";
-                subtitle = "Enable Syncthing through Systemd.";
-                icon_name = "play-symbolic";
-            }
+                (
+                    "Enable Syncthing",
+                    "Enable Syncthing through Systemd.",
+                    "play-symbolic",
+                )
+            };
+
             self.enable_row.set_title(title);
             self.enable_row.set_subtitle(subtitle);
             self.enable_img.set_icon_name(Some(icon_name));

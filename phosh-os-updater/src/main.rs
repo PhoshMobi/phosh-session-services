@@ -135,7 +135,9 @@ fn random_delay() -> Duration {
 }
 
 fn i18n_init() {
-    setlocale(gettextrs::LocaleCategory::LcAll, "");
+    unsafe {
+        setlocale(gettextrs::LocaleCategory::LcAll, "");
+    }
     bindtextdomain(config::GETTEXT_PACKAGE, config::LOCALEDIR)
         .expect("Unable to bind the text domain");
     bind_textdomain_codeset(config::GETTEXT_PACKAGE, "UTF-8")
