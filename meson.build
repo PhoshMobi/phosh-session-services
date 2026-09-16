@@ -9,8 +9,19 @@ gnome = import('gnome')
 i18n = import('i18n')
 
 services = [
-  # service name / app-id / descriptive name / busname
-  ['phosh-os-updater', 'mobi.phosh.OsUpdater', 'Phosh OS Update Notifier', ''],
+  # service name / app-id / descriptive name / service type
+  [
+    'phosh-os-updater',
+    'mobi.phosh.OsUpdater',
+    'Phosh OS Update Notifier',
+    'simple',
+  ],
+  [
+    'phosh-syncbus',
+    'mobi.phosh.syncbus',
+    'A D-Bus server for Syncthing.',
+    'dbus',
+  ],
 ]
 
 server_exe_name = 'phosh-syncbus'
