@@ -1,16 +1,16 @@
 project(
-    'phosh-session-services',
-    'rust',
-    version: '0.2.0',
-    meson_version: '>= 1.1',
+  'phosh-session-services',
+  'rust',
+  version: '0.2.0',
+  meson_version: '>= 1.1',
 )
 
 gnome = import('gnome')
 i18n = import('i18n')
 
 services = [
-    # service name / app-id / descriptive name
-    ['phosh-os-updater', 'mobi.phosh.OsUpdater', 'Phosh OS Update Notifier'],
+  # service name / app-id / descriptive name / busname
+  ['phosh-os-updater', 'mobi.phosh.OsUpdater', 'Phosh OS Update Notifier', ''],
 ]
 
 server_exe_name = 'phosh-syncbus'
@@ -31,13 +31,13 @@ desktop_dir = data_dir / 'applications'
 systemd_user_unit_dir = get_option('systemd_user_unit_dir')
 systemd_dep = dependency('systemd', version: '>= 242', required: false)
 if systemd_user_unit_dir == ''
-    if systemd_dep.found()
-        systemd_user_unit_dir = systemd_dep.get_variable(
-            pkgconfig: 'systemduserunitdir',
-        )
-    else
-        systemd_user_unit_dir = prefix / lib_dir / 'systemd' / 'user'
-    endif
+  if systemd_dep.found()
+    systemd_user_unit_dir = systemd_dep.get_variable(
+      pkgconfig: 'systemduserunitdir',
+    )
+  else
+    systemd_user_unit_dir = prefix / lib_dir / 'systemd' / 'user'
+  endif
 endif
 
 cargo = find_program('cargo')
@@ -45,10 +45,10 @@ cargo_args = ['--manifest-path', meson.project_source_root() / 'Cargo.toml']
 cargo_args += ['--target-dir', meson.project_build_root() / 'target']
 
 if get_option('debug')
-    cargo_target = 'debug'
+  cargo_target = 'debug'
 else
-    cargo_args += ['--release']
-    cargo_target = 'release'
+  cargo_args += ['--release']
+  cargo_target = 'release'
 endif
 
 cargo_env = environment()
@@ -60,7 +60,7 @@ subdir('phosh-os-updater')
 subdir('phosh-syncbus')
 
 if get_option('demo')
-    subdir('demo')
+  subdir('demo')
 endif
 
 gnome.post_install(gtk_update_icon_cache: true, update_desktop_database: true)
