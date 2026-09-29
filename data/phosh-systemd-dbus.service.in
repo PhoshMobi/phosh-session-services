@@ -1,5 +1,5 @@
 [Unit]
-Description=A D-Bus server for Syncthing.
+Description=@description@
 PartOf=graphical-session.target
 After=graphical-session.target
 ConditionEnvironment=WAYLAND_DISPLAY
@@ -8,5 +8,5 @@ After=gnome-session-initialized.target
 
 [Service]
 Type=dbus
-BusName=mobi.phosh.syncbus
-ExecStart=@LIBEXEC_DIR@/@EXE_NAME@
+BusName=@busname@
+ExecStart=@libexecdir@/@service_exe@
