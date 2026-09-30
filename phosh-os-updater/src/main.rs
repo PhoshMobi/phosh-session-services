@@ -37,7 +37,7 @@ impl Service {
 
         let nm = self.nm.clone();
         tokio::spawn(async move {
-            nm.monitor_connectivity(move |c| {
+            nm.monitor_connectivity(move |c, _m| {
                 if let Err(err) = tx.try_send(c) {
                     trace!("Failed to send connectivity update: {err}");
                 }
