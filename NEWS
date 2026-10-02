@@ -1,3 +1,16 @@
+phosh-session-services 0.2.1
+----------------------------
+Released October 2026
+* Stop os-update when the system doesn't support sysupdates
+* Don't pull phosh-syncbus into the session. Phosh will DBus activate
+  it when needed
+* Various bug and robustness fixes
+* Issues fixed:
+    * https://gitlab.gnome.org/World/Phosh/phosh-session-services/-/work_items/5
+* Contributors:
+    * Arun Mani J
+    * Guido Günther
+
 phosh-session-services 0.2.0
 ----------------------------
 Released July 2026
