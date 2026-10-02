@@ -1,3 +1,37 @@
+phosh-session-services (0.2.1) experimental; urgency=medium
+
+  [ Guido Günther ]
+  * gitignore: Ignore more packaging files
+  * tree: Rename to phosh-syncbus. Use our naming pattern.
+  * ci: Adjust artifact paths
+  * ci: Add workflow and retry rules
+  * gitignore: Ignore build/
+  * os-updater: Make zbus result explicit. Otherwise it gets into our way
+  * tree: Rename to phosh-syncbus. Use our naming patterntoo often
+  * os-updater: Quit in case the update service is not available.
+    There's no point in running the daemon in that case. We bubble
+    a `NotSupported` error and exit in that case.
+  * os-updater: Improve error messages.
+    Don't swallow them with `let _`.
+  * syncbus: Don't pull service into session.
+    It's DBus activated so no need to start enable it.
+    Fixes: 2b2f19f ("data: Make sure services become part of the Phosh session")
+  * demo: Avoid late init. Makes clippy happy.
+  * os-updater: Mark setlocale as unsafe
+    gettext-rs 0.8.0 requires this and we do it early on before
+    launching threads.
+  * build: Bump dependencies.
+    This includes a gettext-rs bump that fixes a compilation failure
+    on arm64.
+  * meson: Reformat according to our indent
+  * data: Handle dbus services via templating as well
+
+  [ Arun Mani J ]
+  * syncbus/server: Generate configuration if not found.
+    Closes: https://gitlab.gnome.org/World/Phosh/phosh-session-services/-/work_items/5
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 02 Oct 2026 16:46:03 +0200
+
 phosh-session-services (0.2.0) experimental; urgency=medium
 
   [ Guido Günther ]
