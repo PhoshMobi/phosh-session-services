@@ -101,6 +101,22 @@ prefix
 phosh-os-updater indicates when new OS updates are available. It uses
 `org.freedesktop.sysupdate1` for that.
 
+## Phosh Push Distributor
+
+phosh-push-distributor distributes unified push notifications to
+clients using unified push. The main configuration file is at
+`~/.config/phosh-push-distributor/config.toml`:
+
+```toml
+default_provider = 'ntfy'
+
+[ntfy]
+server = 'https://ntfy.example.com'
+```
+
+Secrets are stored in the user's keyring. State is kept in
+`~/.local/state/phosh-push-distributor/`.
+
 ## Getting in Touch
 
 Please use [`phosh.mobi`](https://matrix.to/#/#phosh:phosh.mobi) Matrix channel

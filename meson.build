@@ -17,6 +17,12 @@ services = [
     'simple',
   ],
   [
+    'phosh-push-distributor',
+    'org.unifiedpush.Distributor.phosh',
+    'Phosh Unified Push distributor',
+    'dbus',
+  ],
+  [
     'phosh-syncbus',
     'mobi.phosh.syncbus',
     'A D-Bus server for Syncthing.',
@@ -25,6 +31,7 @@ services = [
 ]
 
 server_exe_name = 'phosh-syncbus'
+push_distributor_exe_name = 'phosh-push-distributor'
 demo_exe_name = 'phosh-syncbus-demo'
 
 conf_data = configuration_data()
@@ -68,6 +75,7 @@ cargo_env.set('CARGO_HOME', meson.project_build_root() / 'cargo')
 subdir('po')
 subdir('data')
 subdir('phosh-os-updater')
+subdir('phosh-push-distributor')
 subdir('phosh-syncbus')
 
 if get_option('demo')
