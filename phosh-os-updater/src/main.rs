@@ -75,7 +75,7 @@ impl Service {
             .body(&msg);
         let id = self.noti_manager.notify(noti, None, self.noti_id).await?;
 
-        trace!("Notification {} for {} send", id, update.version);
+        trace!("Notification {} for {} sent", id, update.version);
         self.noti_id = Some(id);
 
         Ok(())
