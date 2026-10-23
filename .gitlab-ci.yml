@@ -32,13 +32,11 @@ default:
 
 image: debian:testing
 
-before_script:
-  - apt-get update -y
-  - apt-get install -y build-essential rustup
-  - apt -y build-dep .
-  - rustup default stable
-  - rustup toolchain install nightly
-  - rustup component add clippy rustfmt
+.rustdeps: &rustdeps
+  before_script:
+    - apt-get update -y
+    - apt-get install -y build-essential rustfmt rust-clippy
+    - apt -y build-dep .
 
 stages:
   - build
@@ -48,21 +46,28 @@ stages:
 
 lint:
   stage: test
+  extends: .rustdeps
   script:
-    - meson setup build -Ddemo=true
-    - CARGO_HOME=build/cargo cargo +nightly fmt --all --check
+    - CARGO_HOME=build/cargo cargo fmt --all --check
     - CARGO_HOME=build/cargo cargo clippy --target-dir build/target --workspace --no-deps -- -D warnings
 
 build:
   stage: build
+  extends: .rustdeps
   script:
     - meson setup build -Ddemo=true -Dbuildtype=release
     - meson compile -C build
   artifacts:
     paths:
-      - build/phosh-syncbus/phosh-syncbus
-      - build/phosh-os-updater/phosh-os-updater
-      - build/demo/phosh-syncbus-demo
+      - build/
+
+test:
+  stage: test
+  extends: .rustdeps
+  needs:
+    - build
+  script:
+    - meson test -C build
 
 check-meson:
   stage: style-checks

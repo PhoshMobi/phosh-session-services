@@ -161,7 +161,7 @@ impl NotiManager {
             let is_known = self.ids.lock().unwrap().remove(&args.id);
             if !is_known {
                 trace!("Notification with id {} is not for us", args.id);
-                return Ok(());
+                continue;
             }
 
             debug!(

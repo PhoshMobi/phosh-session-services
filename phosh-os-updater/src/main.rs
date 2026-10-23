@@ -11,12 +11,54 @@ use phosh_os_updater::updater::{UpdateChecker, UpdateError, UpdateInfo};
 use phosh_session_services::{nm, noti, pms};
 use tokio::time::sleep;
 
+#[derive(Debug, Clone, Copy)]
+struct ConnectionState {
+    connectivity: nm::Connectivity,
+    metered: nm::Metered,
+}
+
+impl Default for ConnectionState {
+    fn default() -> Self {
+        Self {
+            connectivity: nm::Connectivity::Unknown,
+            metered: nm::Metered::Unknown,
+        }
+    }
+}
+
+impl ConnectionState {
+    fn is_connected(self) -> bool {
+        self.connectivity == nm::Connectivity::Full
+    }
+
+    fn is_metered(self) -> bool {
+        matches!(
+            self.metered,
+            nm::Metered::Yes | nm::Metered::GuessYes | nm::Metered::Unknown
+        )
+    }
+
+    fn can_update(self) -> bool {
+        self.is_connected() && !self.is_metered()
+    }
+
+    // Update connection state. Returns true if the state changed to a state we want to pull
+    // updates over.
+    fn update(&mut self, new_nm_state: (nm::Connectivity, nm::Metered)) -> bool {
+        let old = *self;
+        (self.connectivity, self.metered) = new_nm_state;
+
+        self.can_update() && (old.connectivity != self.connectivity || old.metered != self.metered)
+    }
+}
+
 struct Service {
     nm: nm::NetworkManager,
     noti_manager: noti::NotiManager,
     update_checker: UpdateChecker,
     noti_id: Option<u32>,
     update: Option<UpdateInfo>,
+    conn_state: ConnectionState,
 }
 
 impl Service {
@@ -29,16 +71,17 @@ impl Service {
             update_checker: UpdateChecker::new().await?,
             noti_id: None,
             update: None,
+            conn_state: ConnectionState::default(),
         })
     }
 
-    fn start_nm_monitor(&self) -> async_channel::Receiver<nm::Connectivity> {
+    fn start_nm_monitor(&self) -> async_channel::Receiver<(nm::Connectivity, nm::Metered)> {
         let (tx, rx) = async_channel::bounded(1);
 
         let nm = self.nm.clone();
         tokio::spawn(async move {
-            nm.monitor_connectivity(move |c| {
-                if let Err(err) = tx.try_send(c) {
+            nm.monitor_connectivity(move |c, m| {
+                if let Err(err) = tx.force_send((c, m)) {
                     trace!("Failed to send connectivity update: {err}");
                 }
             })
@@ -75,13 +118,18 @@ impl Service {
             .body(&msg);
         let id = self.noti_manager.notify(noti, None, self.noti_id).await?;
 
-        trace!("Notification {} for {} send", id, update.version);
+        trace!("Notification {} for {} sent", id, update.version);
         self.noti_id = Some(id);
 
         Ok(())
     }
 
     async fn maybe_notify_update(&mut self) -> std::result::Result<(), UpdateError> {
+        if !self.conn_state.can_update() {
+            trace!("No connection we should update over");
+            return Ok(());
+        }
+
         trace!("Checking for updates…");
         match self.update_checker.check_for_updates().await {
             Ok(Some(update)) => {
@@ -131,7 +179,7 @@ fn should_check_updates(last_check: Option<Instant>) -> bool {
 fn random_delay() -> Duration {
     let hours = rand::random_range(4..=12);
 
-    Duration::from_secs(hours * 60 * 60)
+    Duration::from_hours(hours)
 }
 
 fn i18n_init() {
@@ -155,20 +203,16 @@ async fn main() -> zbus::Result<()> {
     let mut app = Service::new("mobi.phosh.OsUpdater").await?;
     let nm_rx = app.start_nm_monitor();
     let noti_rx = app.start_noti_monitor();
-    let mut connectivity = nm::Connectivity::Unknown;
     let mut next_check = Box::pin(sleep(random_delay()));
     let mut last_update_check = None;
 
     trace!("Entering listening loop…");
     loop {
         tokio::select! {
-            Ok(new) = nm_rx.recv() => {
-                let old = connectivity;
-                connectivity = new;
+            Ok(new_nm_state) = nm_rx.recv() => {
+                let can_check = app.conn_state.update(new_nm_state);
 
-                if old != nm::Connectivity::Full
-                && connectivity == nm::Connectivity::Full
-                && should_check_updates(last_update_check) {
+                if can_check && should_check_updates(last_update_check) {
                     match app.maybe_notify_update().await {
                         Err(UpdateError::NotSupported(_)) => {
                             info!("Update service not supported, quitting");
@@ -198,13 +242,10 @@ async fn main() -> zbus::Result<()> {
             }
 
             () = &mut next_check => {
-                if connectivity == nm::Connectivity::Full {
-                    if let Err(err) = app.maybe_notify_update().await {
-                        warn!("Update check failed: {err}");
-                    }
-                    last_update_check = Some(Instant::now());
+                if let Err(err) = app.maybe_notify_update().await {
+                    warn!("Update check failed: {err}");
                 }
-
+                last_update_check = Some(Instant::now());
                 next_check = Box::pin(sleep(random_delay()));
             }
 
@@ -217,4 +258,102 @@ async fn main() -> zbus::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use nm::{Connectivity, Metered};
+
+    use super::*;
+
+    fn state(connectivity: Connectivity, metered: Metered) -> ConnectionState {
+        ConnectionState {
+            connectivity,
+            metered,
+        }
+    }
+
+    #[test]
+    fn default_cannot_update() {
+        assert!(!ConnectionState::default().can_update());
+    }
+
+    #[test]
+    fn can_update_only_on_full_unmetered() {
+        for (metered, expected) in [
+            (Metered::No, true),
+            (Metered::GuessNo, true),
+            (Metered::Yes, false),
+            (Metered::GuessYes, false),
+            (Metered::Unknown, false),
+        ] {
+            assert_eq!(
+                state(Connectivity::Full, metered).can_update(),
+                expected,
+                "Full/{metered:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn cannot_update_without_full_connectivity() {
+        for connectivity in [
+            Connectivity::Unknown,
+            Connectivity::None,
+            Connectivity::Portal,
+            Connectivity::Limited,
+        ] {
+            assert!(
+                !state(connectivity, Metered::No).can_update(),
+                "{connectivity:?}/No"
+            );
+        }
+    }
+
+    #[test]
+    fn update_reports_transition_to_usable() {
+        let mut s = ConnectionState::default();
+        assert!(s.update((Connectivity::Full, Metered::No)));
+        assert!(s.can_update());
+    }
+
+    #[test]
+    fn update_no_check_while_metered() {
+        let mut s = ConnectionState::default();
+        assert!(!s.update((Connectivity::Full, Metered::Yes)));
+        assert!(!s.update((Connectivity::Full, Metered::GuessYes)));
+        assert!(!s.can_update());
+    }
+
+    #[test]
+    fn update_metered_to_unmetered_triggers() {
+        let mut s = state(Connectivity::Full, Metered::Yes);
+        assert!(s.update((Connectivity::Full, Metered::No)));
+    }
+
+    #[test]
+    fn update_unmetered_to_metered_does_not_trigger() {
+        let mut s = state(Connectivity::Full, Metered::No);
+        assert!(!s.update((Connectivity::Full, Metered::Yes)));
+        assert!(!s.can_update());
+    }
+
+    #[test]
+    fn update_reconnect_triggers() {
+        let mut s = state(Connectivity::Full, Metered::No);
+        assert!(!s.update((Connectivity::None, Metered::No)));
+        assert!(s.update((Connectivity::Full, Metered::No)));
+    }
+
+    #[test]
+    fn update_same_state_does_not_retrigger() {
+        let mut s = state(Connectivity::Full, Metered::No);
+        assert!(!s.update((Connectivity::Full, Metered::No)));
+    }
+
+    #[test]
+    fn update_between_unmetered_guesses_triggers() {
+        let mut s = state(Connectivity::Full, Metered::GuessNo);
+        assert!(s.update((Connectivity::Full, Metered::No)));
+    }
 }

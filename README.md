@@ -101,6 +101,14 @@ prefix
 phosh-os-updater indicates when new OS updates are available. It uses
 `org.freedesktop.sysupdate1` for that.
 
+You can use
+[`RUST_LOG`](https://docs.rs/env_logger/latest/env_logger/#enabling-logging) to
+configure logging. For example, to enable trace logging for only our modules use:
+
+```sh
+RUST_LOG=phosh_os_updater=trace,phosh_session_services=trace phosh-os-updater
+```
+
 ## Phosh Push Distributor
 
 phosh-push-distributor distributes unified push notifications to
@@ -116,6 +124,14 @@ server = 'https://ntfy.example.com'
 
 Secrets are stored in the user's keyring. State is kept in
 `~/.local/state/phosh-push-distributor/`.
+
+You can use
+[`RUST_LOG`](https://docs.rs/env_logger/latest/env_logger/#enabling-logging) to
+configure logging:
+
+```sh
+RUST_LOG=phosh_push_distributor=trace phosh-push-distributor
+```
 
 ## Getting in Touch
 
