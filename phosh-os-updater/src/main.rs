@@ -131,7 +131,7 @@ fn should_check_updates(last_check: Option<Instant>) -> bool {
 fn random_delay() -> Duration {
     let hours = rand::random_range(4..=12);
 
-    Duration::from_secs(hours * 60 * 60)
+    Duration::from_hours(hours)
 }
 
 fn i18n_init() {
