@@ -60,9 +60,14 @@ build:
     - meson compile -C build
   artifacts:
     paths:
-      - build/phosh-syncbus/phosh-syncbus
-      - build/phosh-os-updater/phosh-os-updater
-      - build/demo/phosh-syncbus-demo
+      - build/
+
+test:
+  stage: test
+  needs:
+    - build
+  script:
+    - meson test -C build
 
 check-meson:
   stage: style-checks
