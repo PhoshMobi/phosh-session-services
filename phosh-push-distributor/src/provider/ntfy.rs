@@ -34,9 +34,9 @@ const TOPIC_PREFIX: &str = "up";
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(20);
 /// ntfy sends a keepalive every 45s by default.
-const IDLE_TIMEOUT: Duration = Duration::from_secs(180);
+const IDLE_TIMEOUT: Duration = Duration::from_mins(3);
 const BACKOFF_MIN: Duration = Duration::from_secs(1);
-const BACKOFF_MAX: Duration = Duration::from_secs(300);
+const BACKOFF_MAX: Duration = Duration::from_mins(5);
 /// A JSON line is far smaller than this, so we're being fed garbage.
 const MAX_LINE_LEN: usize = 64 * 1024;
 
