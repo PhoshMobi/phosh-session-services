@@ -1,3 +1,12 @@
+phosh-session-services 0.3.0
+----------------------------
+Released November 2026
+* New service: Iniitial unified push distributor using ntfy
+* os-update-service: Don't show notification on metered connections
+* Issues fixed:
+* Contributors:
+    * Guido Günther
+
 phosh-session-services 0.2.1
 ----------------------------
 Released October 2026
