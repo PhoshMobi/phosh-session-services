@@ -1,3 +1,28 @@
+phosh-session-services (0.3.0) experimental; urgency=medium
+
+  * unified-push: Add initial distributor. Supports ntfy, no auth yet.
+  * session-services/noti: Continue when noti id is not for us.
+    Otherwise we can't process the one for us later.
+  * po: Fix path.
+    Fixes: 2fbf58f ("tree: Add os update checker service")
+  * doc: Add hints on logging configuration
+  * session-service: Monitor NM's metered state too.
+    This will allow us to avoid update notifications on metered connections.
+  * os-updater: Use from_hours()
+    Easier to read and makes clippy happy.
+  * os-updater: Fix typo
+  * os-updater: Track connectivity and metered on app.
+    This will allow us to make this more self contained. We reject
+    updating on metered connections.
+  * build: Run os-updater tests
+  * ci: Run tests
+  * ci: Use packaged rust.
+    Use it only in the jobs that need it and reuse already fetched
+    crates.
+  * push-distributor: Use from_mins(). Easier to read and makes clippy happy
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 07 Nov 2026 16:17:13 +0100
+
 phosh-session-services (0.2.1) experimental; urgency=medium
 
   [ Guido Günther ]
